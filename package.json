@@ -1,0 +1,29 @@
+{
+  "name": "msg91-node-v2",
+  "version": "1.0.0",
+  "description": "for send sms via node",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MSG91/msg91-node-v2"
+  },
+  "keywords": [
+    "msg91",
+    "node",
+    "send sms",
+    "API",
+    "API V2"
+  ],
+  "author": "Sarfaraz Ansari",
+  "license": "MIT",
+  "homepage": "https://github.com/MSG91/msg91-node-v2",
+  "devDependencies": {
+    "express": "^4.16.3"
+  },
+  "bugs": {
+    "url": "https://github.com/MSG91/msg91-node-v2/issues"
+  },
+  "dependencies": {
+    "request": "^2.87.0"
+  }
+}
