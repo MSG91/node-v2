@@ -4,8 +4,26 @@ const app = express();
 const msg91 = new MSG91(process.env.AUTH_KEY);
 
 app.get('/', (req, res) => {
-  sendSMS(req, res);
+  if (req.query) {
+    if (req.query['sendsms']) {
+      sendSMS(req, res);
+    }
+    else if (req.query['checkbalance'] && req.query['route']) {
+      checkBalance(req, res, req.query['route']);
+    }
+
+  } else {
+    res.send('Nothing to worry about dude.');
+  }
 })
+
+function checkBalance(req, res, route) {
+  msg91.checkBalance(Number(route)).then((success) => {
+    create (req, res, 'success', success)
+  }).catch((error) => {
+    create (req, res, 'error', error)
+  });
+}
 
 function sendSMS(req, res) {
   let opts = {

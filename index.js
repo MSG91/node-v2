@@ -61,6 +61,13 @@ class MSG91{
     })
   }
 
+  static writeErrMsg(str) {
+    return {
+      status: "error",
+      message: str
+    }
+  }
+
   /**
    * 
    * @param {*} args will be an object which contains all params
@@ -122,8 +129,32 @@ class MSG91{
   /**
    * check balance
    */
-  checkBalance() {
+  checkBalance(route) {
     return new Promise( (resolve, reject) => {
+      if (typeof route === "number" && !isNaN(route)) {
+
+        let options = {
+          method: 'GET',
+          url: `${this.constructor.getBaseURL()}balance.php?type=${route}&authkey=${this.authKey}`
+        };
+  
+        // prepare msg and hit request
+        request(options, (error, response, balance) => {
+          if (error) {
+            reject(error)
+          }
+          if (balance) {
+            let b = balance.trim();
+            resolve({
+              status: "success",
+              message: `your balance for route ${route} is ${b}`
+            });
+          }
+        });
+
+      } else {
+        reject(this.constructor.writeErrMsg('Route number will be numeric.'))
+      }
     })
   }
 
