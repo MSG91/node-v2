@@ -27,7 +27,7 @@ function checkBalance(req, res, route) {
 
 function sendSMS(req, res) {
   let opts = {
-    "sender": "SOCKET",
+    // "sender": "SOCKET",
     "route": "4",
     "country": "91",
     "sms": [

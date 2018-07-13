@@ -1,6 +1,6 @@
 ## MSG91 - Node.js SDK
 
-This SDK allows you to send SMS via MSG91 V2 APIs
+This SDK allows you to send SMS via MSG91 V2 APIs or V1 APIs
 
 ### Set-up:
 
@@ -14,71 +14,69 @@ const MSG91 = require('msg91');
 ```
 3. Initialize with your [MSG91](https://msg91.com) auth key
 ```
-const msg91 = new MSG91('AuthKey');
+const msg91 = new MSG91('YOUR_AUTH_KEY');
 ```
 That's all, your SDK is set up!
 
-### Requests
+## Usage
 
-You now have the send via following methods.
+### Send SMS
 ```javascript
-
+function sendSMS(req, res) {
+  let opts = {
+    "sender": "YOUR_SENDER_ID",
+    "route": "4",
+    "country": "91",
+    "sms": [
+      {
+        "message": "Message1",
+        "to": [
+          "98260XXXXX",
+          "98261XXXXX"
+        ]
+      },
+      {
+        "message": "Message2",
+        "to": [
+          "98260XXXXX",
+          "98261XXXXX"
+        ]
+      }
+    ]
+  };
+  // promise function
+  msg91.send(opts).then((data) => {
+    // in success you'll get object
+    // {"message":"REQUET_ID","type":"success"}
+  }).catch((error) => {
+    // refer Handle error section
+  });
+}
 ```
 
-### Note:
-In `callback` function you'll get two parameters but you have to always listen for second param instead of direct error object.
-Error object sample code
+### Balance Check
 ```javascript
-{"type":"error","message":"ERROR_MESSAGE"}
-```
-
-### Usage:
-
-To send OTP, without optional parameters
-```javascript
-sendOtp.send("919999999999", "PRIIND", function (error, data) {
-  console.log(data);
+// route will be an number
+let route = 1;
+msg91.checkBalance(route).then((data) => {
+  // in success you'll get object
+  // {"status":"success","message":"your balance for route 4 is 7866"}
+}).catch((error) => {
+  // handle error
 });
 ```
 
-To send OTP, with optional parameters
+### handle error
+you'll get error object like below:
 ```javascript
-sendOtp.send("919999999999", "PRIIND", "4635", function (error, data) {
-  console.log(data);
-});
+{
+  status: 'error',
+  message: 'ERROR_MSG'
+}
 ```
 
-If you want to set custom expiry of OTP verification  
-```javascript
-sendOtp.setOtpExpiry('90'); //in minutes
-```
-
-To retry OTP
-```javascript
-sendOtp.retry("919999999999", false, function (error, data) {
-  console.log(data);
-});
-```
-**Note:** In sendOtp.retry() set retryVoice false if you want to retry otp via text, default value is true
-
-To verify OTP
-```javascript
-sendOtp.verify("919999999999", "4365", function (error, data) {
-  console.log(data); // data object with keys 'message' and 'type'
-  if(data.type == 'success') console.log('OTP verified successfully')
-  if(data.type == 'error') console.log('OTP verification failed')
-});
-```
-
-### Options:
-
-By default sendotp uses default message template, but custom message template can also set in constructor like
-```javascript
-const SendOtp = require('sendotp');
-const sendOtp = new SendOtp('AuthKey', 'Otp for your order is {{otp}}, please do not share it with anybody');
-```
-
-`{{otp}}` expression is used to inject generated otp in message.
+### Response codes:
+Please refer [response_codes](https://docs.msg91.com/collection/msg91-api-integration/5/send-sms-v2/TZ2IXQHS)
 
 ### Licence:
 

@@ -4,6 +4,7 @@
   "description": "for send sms via node",
   "main": "index.js",
   "scripts": {
+    "start": "cross-env AUTH_KEY=YOUR_AUTH_KEY node demo/app.js",
     "start:dev": "cross-env AUTH_KEY=YOUR_AUTH_KEY nodemon --inspect demo/app.js"
   },
   "repository": {
@@ -22,7 +23,8 @@
   "homepage": "https://github.com/MSG91/node-v2",
   "devDependencies": {
     "cross-env": "^5.2.0",
-    "express": "^4.16.3"
+    "express": "^4.16.3",
+    "nodemon": "*"
   },
   "bugs": {
     "url": "https://github.com/MSG91/node-v2/issues"

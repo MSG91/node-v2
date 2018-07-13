@@ -78,7 +78,7 @@ class MSG91{
       let validation = this.constructor.validateKeys(this.opts);
       // fails in validation then goes inside
       if (validation) {
-        reject(validation);
+        reject(this.constructor.writeErrMsg(validation.message));
       }
 
       // cross check if message contains unicode string
