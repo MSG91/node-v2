@@ -1,7 +1,7 @@
 const express = require('express')
 const MSG91 = require('../index.js');
 const app = express();
-const msg91 = new MSG91('64085AhoMeZih53183781');
+const msg91 = new MSG91(process.env.AUTH_KEY);
 
 app.get('/', (req, res) => {
   sendSMS(req, res);
@@ -14,8 +14,8 @@ function sendSMS(req, res) {
     "country": "91",
     "sms": [
       {
-        "message": "Hey Dude Testing",
-        "to": [ "9893459995", "9575559995" ]
+        "message": "Hey Dude Testing cxß∂∑ß ∆ßåß¬˚≤ + @",
+        "to": [ "9893459995" ]
       }
     ]
   };
@@ -27,8 +27,8 @@ function sendSMS(req, res) {
 }
 
 function create (req, res, status, data) {
-  console.log (data)
-  var html = `<h4>Status: ${status}</h4><pre>${data}</pre>`;
+  let d = JSON.stringify(data);
+  var html = `<h4>Status: ${status}</h4><pre>${d}</pre>`;
   res.writeHead(200, {
     'Content-Type': 'text/html',
     'Content-Length': html.length,

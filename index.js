@@ -1,6 +1,8 @@
 "use strict";
 const request = require('request');
 
+const SPECIAL_CHARS = ['+', '&', '#', '%', '@', '/', ';', '=', '?', '^', '|'];
+
 class MSG91{
   /**
   * Creates a new MSG91 instance
@@ -19,29 +21,44 @@ class MSG91{
    * @returns {string} Base URL for MSG91 api call
    */
   static getBaseURL() {
-    return "https://control.msg91.com/api/v2/sendsms";
+    return "https://control.msg91.com/api/";
   }
 
-  static validateKeys() {
+  static validateKeys(opts) {
     // check for sender id
-    if (!this.opts['sender']) {
+    if (!opts['sender']) {
       return new Error("MSG91 Sender Id is not provided.");
     }
     // check for route
-    if (!this.opts['route']) {
+    if (!opts['route']) {
       return new Error("MSG91 route Id is not provided.");
     }
     // check for sms object
-    if (this.opts['sms']){
+    if (opts['sms']){
       new Error("MSG91 SMS object will be needed");
     }
-    if (!(this.opts['sms'] instanceof Array)) {
+    if (!(opts['sms'] instanceof Array)) {
       return new Error("MSG91 SMS object will be an array");
     }
-    if (this.opts['sms'] instanceof Array && this.opts['sms'].length === 0) {
+    if (opts['sms'] instanceof Array && opts['sms'].length === 0) {
       return new Error("MSG91 No data provided");
     }    
     return null;
+  }
+
+  static isUnicodeString(str) {
+    for (var i = 0, n = str.length; i < n; i++) {
+      if (str.charCodeAt( i ) > 255) { 
+        return true; 
+      }
+    }
+    return false;
+  }
+
+  static enocodeMsgString(str) {
+    return SPECIAL_CHARS.some( (v) => {
+      return str.indexOf(v) >= 0;
+    })
   }
 
   /**
@@ -49,23 +66,43 @@ class MSG91{
    * @param {*} args will be an object which contains all params
    */
   send(opts) {
-    this.constructor.opts = opts;
+    this.opts = opts;
     return new Promise( (resolve, reject) => {
-      let validation = this.constructor.validateKeys();
+      let validation = this.constructor.validateKeys(this.opts);
       // fails in validation then goes inside
       if (validation) {
         reject(validation);
       }
 
+      // cross check if message contains unicode string
+      let isUnicode = false;
+      this.opts.sms.forEach(item => {
+        // check for unicode
+        try {
+          isUnicode = this.constructor.isUnicodeString(item.message);
+        } catch (error) {}
+
+        // check for message contains special character
+        try {
+          if (this.constructor.enocodeMsgString(item.message)) {
+            message = encodeURIComponent(encodeURIComponent(message));
+          }
+        }catch (error) {}
+      });
+
+      // after unicode toll lets append value
+      if(isUnicode){
+        this.opts.unicode = 1;
+      }
+
       let options = {
         method: 'POST',
-        url: this.constructor.getBaseURL(),
+        url: `${this.constructor.getBaseURL()}v2/sendsms`,
         headers : {
-          authkey: this.constructor.authkey,
+          authkey: this.authKey,
           'content-type': 'application/json'
         },
-        body: this.constructor.opts,
-        json: this.constructor.opts
+        json: this.opts
       };
 
       // prepare msg and hit request
@@ -73,11 +110,21 @@ class MSG91{
         if (error) {
           reject(error)
         }
-        if (data) {
+        if (data && data.type === "success") {
           resolve(data);
+        } else {
+          reject(data)
         }
       });
     });
+  }
+
+  /**
+   * check balance
+   */
+  checkBalance() {
+    return new Promise( (resolve, reject) => {
+    })
   }
 
 }
