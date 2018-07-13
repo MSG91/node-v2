@@ -61,10 +61,10 @@ class MSG91{
     })
   }
 
-  static writeErrMsg(str) {
+  static writeErrMsg(o) {
     return {
       status: "error",
-      message: str
+      message: (typeof o === 'string') ? o : o.msg
     }
   }
 
@@ -139,16 +139,19 @@ class MSG91{
         };
   
         // prepare msg and hit request
-        request(options, (error, response, balance) => {
+        request(options, (error, response, data) => {
           if (error) {
             reject(error)
           }
-          if (balance) {
-            let b = balance.trim();
+          // purify data due to not getting json response.
+          data = JSON.parse(data)
+          if (typeof data === 'number') {
             resolve({
               status: "success",
-              message: `your balance for route ${route} is ${b}`
+              message: `your balance for route ${route} is ${data}`
             });
+          } else {
+            reject(this.constructor.writeErrMsg(data))
           }
         });
 
